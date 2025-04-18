@@ -1,0 +1,20 @@
+# Flask and Web Server
+Flask>=2.0
+Flask-SocketIO>=5.0
+eventlet>=0.33 # Required for Flask-SocketIO async_mode='eventlet'
+
+# Background Tasks
+celery[redis]>=5.2
+redis>=4.3 # Redis client
+
+# ML/Audio Processing
+torch>=2.0 # Ensure compatibility with your CUDA version
+torchaudio>=2.0
+transformers>=4.24 # Or a version known to work well with your torch/CUDA
+# Whisper dependencies like ffmpeg are handled in Dockerfile
+pydub>=0.25
+numpy>=1.21
+# tqdm is used in transcribe_logic for internal progress but not printed
+
+# Werkzeug is a Flask dependency, ensure it's compatible
+Werkzeug>=2.0

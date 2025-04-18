@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: transcriber_redis
+    ports:
+      # Only expose if you need to connect from outside Docker network (e.g., debugging)
+      # - "127.0.0.1:6379:6379"
+      - "6379:6379" # Expose for simplicity during dev
+    volumes:
+      - redis_data:/data # Optional: Persist Redis data across restarts
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: transcriber_web
+    ports:
+      - "5000:5000" # Map host port 5000 to container port 5000
+    volumes:
+      - ./data:/data       # Mount host ./data to /data in container (uploads)
+      - ./output:/output   # Mount host ./output to /output in container (transcriptions)
+      # For development: Mount code to see changes without rebuilding image
+      # Comment out or remove for production deployment
+      - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      # --- IMPORTANT: Change this in a real deployment ---
+      - FLASK_SECRET_KEY=you_really_should_change_this_secret_key
+      - PYTHONUNBUFFERED=1 # Ensure Python output is logged immediately
+    depends_on:
+      - redis
+    restart: unless-stopped
+    # --- Nvidia GPU Configuration ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              # count: 1 # Request one specific GPU
+              count: all # Or request all available GPUs (worker will use one)
+              capabilities: [gpu] # Request GPU capabilities
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: transcriber_worker
+    # Command to start the Celery worker
+    command: celery -A celery_app.celery worker --loglevel=info -P eventlet -c 1 # Use eventlet, concurrency 1 to manage GPU memory
+    volumes:
+      - ./data:/data       # Worker needs access to read uploads
+      - ./output:/output   # Worker needs access to write transcriptions
+      # For development: Mount code
+      # Comment out or remove for production deployment
+      - .:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - NVIDIA_VISIBLE_DEVICES=all # Make GPUs visible inside the container
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+      - web # Optional, wait for web service if direct communication needed (not needed for redis)
+    restart: unless-stopped
+    # --- Nvidia GPU Configuration ---
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # Let worker pick a GPU if multiple requested by web
+              capabilities: [gpu]
+
+volumes:
+  redis_data: # Define the named volume for Redis persistence
