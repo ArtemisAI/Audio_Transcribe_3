@@ -9,8 +9,13 @@ services:
     volumes:
       - redis_data:/data # Optional: Persist Redis data across restarts
     restart: unless-stopped
+    healthcheck: # Added basic Redis healthcheck
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  web: # Uses CMD from Dockerfile now
+  web:
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,21 +25,24 @@ services:
     volumes:
       - ./data:/data
       - ./output:/output
-      - .:/app # Development mount
+      - .:/app # Development mount (ensure permissions allow reading)
     environment:
       - REDIS_URL=redis://redis:6379/0
-      - FLASK_SECRET_KEY=you_really_should_change_this_secret_key # CHANGE THIS
+      - FLASK_SECRET_KEY=you_really_should_change_this_secret_key_for_prod # CHANGE THIS
       - PYTHONUNBUFFERED=1
-      - EVENTLET_HUB_USE_SELECT=1 # Keep this for potential compatibility
+      # - EVENTLET_HUB_USE_SELECT=1 # Removed, usually not needed
+      - UPLOAD_FOLDER=/data # Pass via env var
+      - OUTPUT_FOLDER=/output # Pass via env var
     depends_on:
-      - redis
+      redis: # Wait for Redis to be healthy
+        condition: service_healthy
     restart: unless-stopped
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: all
+              count: all # Use '1' if you want to limit to one GPU
               capabilities: [gpu]
 
   worker:
@@ -50,20 +58,22 @@ services:
       - .:/app # Development mount
     environment:
       - REDIS_URL=redis://redis:6379/0
-      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_VISIBLE_DEVICES=all # Ensure worker sees the GPU
       - PYTHONUNBUFFERED=1
-      - EVENTLET_HUB_USE_SELECT=1 # Match web service setting
-      # PYTHONPATH now set in Dockerfile
+      # - EVENTLET_HUB_USE_SELECT=1 # Removed
+      - UPLOAD_FOLDER=/data # Pass via env var
+      - OUTPUT_FOLDER=/output # Pass via env var
     depends_on:
-      - redis
-      # - web # Usually not needed
+      redis: # Wait for Redis to be healthy
+        condition: service_healthy
+      # - web # Usually not needed unless worker directly calls web API
     restart: unless-stopped
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: all
+              count: all # Use '1' if you want to limit to one GPU
               capabilities: [gpu]
 
 volumes:

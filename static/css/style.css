@@ -1,0 +1,213 @@
+/* General Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #343a40;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 25px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1, h2 {
+    color: #212529;
+    text-align: center;
+    margin-bottom: 1em;
+}
+h1 { font-size: 1.8em; }
+h2 { font-size: 1.4em; margin-top: 2em; }
+p { color: #6c757d; text-align: center; font-size: 0.9em; }
+
+/* Drop Zone */
+#drop-zone {
+    border: 3px dashed #adb5bd;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+    background-color: #f8f9fa;
+}
+
+#drop-zone p {
+    margin: 5px 0;
+    color: #495057;
+    font-size: 1.1em;
+}
+#drop-zone p.allowed-types {
+     font-size: 0.85em;
+     color: #6c757d;
+}
+
+#drop-zone:hover,
+#drop-zone.drag-over {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+
+/* Controls Section */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f1f3f5;
+    border-radius: 6px;
+}
+
+.language-selector label {
+    margin-right: 8px;
+    font-weight: 500;
+    color: #495057;
+}
+
+#language {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background-color: #fff;
+}
+
+#upload-button {
+    padding: 10px 20px;
+    background-color: #198754; /* Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s;
+}
+
+#upload-button:disabled {
+    background-color: #6c757d; /* Gray */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#upload-button:hover:not(:disabled) {
+    background-color: #157347; /* Darker Green */
+}
+
+/* File List */
+#file-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+#file-list li {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    transition: background-color 0.3s;
+}
+#file-list li:last-child {
+    margin-bottom: 0;
+}
+
+#file-list li.info-message {
+    justify-content: center;
+    color: #6c757d;
+    font-style: italic;
+    background-color: transparent;
+    border: none;
+}
+
+
+.filename {
+    font-weight: 500;
+    color: #495057;
+    margin-right: 10px;
+    word-break: break-all;
+    flex-grow: 1; /* Allow filename to take up space */
+}
+
+.filesize {
+    font-size: 0.85em;
+    color: #6c757d;
+    white-space: nowrap;
+    margin-right: 15px;
+}
+
+.status-container {
+    flex-basis: 250px; /* Ensure enough space for status/progress */
+    text-align: right;
+    margin-left: 15px;
+}
+
+.status-text {
+    font-size: 0.9em;
+    color: #495057;
+    display: block; /* Ensure it takes its own line if needed */
+    margin-bottom: 5px; /* Space before progress bar */
+}
+#file-list li.queued .status-text { color: #0d6efd; } /* Blue */
+#file-list li.uploading .status-text { color: #fd7e14; } /* Orange */
+#file-list li.processing .status-text { color: #0dcaf0; } /* Cyan */
+#file-list li.complete .status-text { color: #198754; font-weight: 500; } /* Green */
+#file-list li.error .status-text { color: #dc3545; font-weight: 500; } /* Red */
+
+.status-text a {
+    color: #0d6efd; /* Link color */
+    text-decoration: underline;
+    font-weight: normal;
+}
+.status-text a:hover {
+    color: #0a58ca;
+}
+
+
+/* Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #0d6efd; /* Blue */
+    border-radius: 4px;
+    transition: width 0.3s ease-in-out;
+}
+#file-list li.complete .progress-bar { background-color: #198754; } /* Green when complete */
+
+/* Messages Area */
+.messages {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+}
+.messages p {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 0.9em;
+}
+.message.success { background-color: #d1e7dd; border-left: 5px solid #198754; color: #0f5132; }
+.message.error { background-color: #f8d7da; border-left: 5px solid #dc3545; color: #842029; }
+.message.warning { background-color: #fff3cd; border-left: 5px solid #ffc107; color: #664d03; }
+.message.info { background-color: #cff4fc; border-left: 5px solid #0dcaf0; color: #055160; }
