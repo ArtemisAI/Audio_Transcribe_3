@@ -1,5 +1,4 @@
 # Use an official PyTorch runtime with CUDA support matching your RTX 3090
-# Check NVIDIA driver version and choose appropriate CUDA version
 # Example: CUDA 11.8 is common for recent drivers/PyTorch versions
 FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
 # Or use the specific version you confirmed works:
@@ -11,9 +10,9 @@ ENV PYTHONUNBUFFERED=1
 # Environment variable for Hugging Face cache (optional, can speed up builds)
 ENV TRANSFORMERS_CACHE=/app/.cache/huggingface/
 
-# Install ffmpeg for audio processing and redis-tools for debugging/cli
+# Install ffmpeg for audio processing and redis-tools for debugging/cli and shell (sh)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg redis-tools && \
+    apt-get install -y --no-install-recommends ffmpeg redis-tools procps coreutils && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -37,5 +36,4 @@ COPY . /app
 # Expose the Flask port
 EXPOSE 5000
 
-# Set the default command to run the Flask app using eventlet for SocketIO
-CMD ["python", "-m", "eventlet", "webui_app.py"]
+# --- REMOVED CMD line - command is specified in docker-compose.yml ---

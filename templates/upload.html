@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Transcriber</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Include Socket.IO client library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Audio Files for Transcription</h1>
+        <p>Uses Whisper Large v3 Model</p>
+
+        <!-- Drop zone -->
+        <div id="drop-zone">
+            <p>Drag & Drop audio files here or click to select</p>
+            <p class="allowed-types">(Allowed: .mp3, .wav, .flac, .ogg, .m4a, .aac)</p>
+            <input type="file" id="file-input" multiple accept=".mp3,.wav,.flac,.ogg,.m4a,.aac" style="display: none;">
+        </div>
+
+        <!-- Language Selection -->
+        <div class="controls">
+            <div class="language-selector">
+              <label for="language">Transcription Language:</label>
+              <select name="language" id="language">
+                <option value="en" selected>English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+                <option value="ja">Japanese</option>
+                <option value="zh">Chinese</option>
+                <option value="ru">Russian</option>
+                <option value="pt">Portuguese</option>
+                <option value="nl">Dutch</option>
+                <!-- Add more languages supported by Whisper as needed -->
+              </select>
+            </div>
+
+            <!-- Upload Button -->
+            <button id="upload-button" disabled>Upload & Transcribe</button>
+        </div>
+
+
+        <!-- File List and Progress -->
+        <h2>Processing Status</h2>
+        <ul id="file-list">
+            <!-- File items will be dynamically added here -->
+            <li id="no-files-message" class="info-message">No files selected yet.</li>
+        </ul>
+
+        <!-- General Messages/Errors -->
+        <div id="messages" class="messages"></div>
+
+    </div> <!-- /container -->
+
+    <!-- Include the JavaScript file -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
